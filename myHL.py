@@ -1,4 +1,4 @@
-from pyparsing import *
+from pyparsing import Word, Group, ZeroOrMore, OneOrMore, Literal, alphanums, alphas, printables
 
 class MyHL(object):
     def __init__(self):
