@@ -1,14 +1,14 @@
 begin vars
-a,b,d use as ints //ints
-c use as Strings23232323232 //stringsasdkl;jadasd
+a,b,d use as number
+c use as word
 end vars
 begin statements //comment1
-read a
+//read a
 d = 3
 // comment
-b = d + a - 2 + "ww" //adding strings and special characters
-c = "MARC" + "STR" //adding strings
-print a
+b = d - 2 //adding strings and special characters
+c = "MARC" //adding strings
+print a + asd
 print x
 print b
 print c

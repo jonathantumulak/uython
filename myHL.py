@@ -6,14 +6,14 @@ class MyHL(object):
         identifier_list = identifier + ZeroOrMore(Word(',') + identifier)
         self.number_exp = Group(Word(alphanums) + OneOrMore(Word("+-/*%", exact=1) + Word(alphanums)))
         expression = self.number_exp | Word('"' + printables+ '"') | identifier
-        datatype = Literal('int') | Literal('String')
+        datatype = Literal('number') | Literal('word')
         self.print_statement = "print" + identifier
         self.read_statement = "read" + identifier
         self.assignment_statement = identifier + "=" + expression
         self.variable_declaration = identifier_list + "use as" + datatype
         self.variable_stack = {}
 
-        # with open('input.in', 'r') as inputFile:
+        # with open('input.uy', 'r') as inputFile:
         #     code = [i.strip() for i in inputFile.readlines()]
 
         # self.run(code)
@@ -71,7 +71,7 @@ class MyHL(object):
     def check_and_execute(self, statement, begin_stmt, parent=None):
         if not begin_stmt:
             try:
-                variables = self.variable_declaration.parseString(statement)[0::2]
+                variables = self.variable_declaration.parseString(statement, parseAll=True)[0::2]
                 for v in variables[:-1]:
                     self.variable_stack[v] = [None, variables[-1]]
             except:
@@ -79,7 +79,7 @@ class MyHL(object):
         else:
             if statement.startswith('print'):
                 try:
-                    identifier = self.print_statement.parseString(statement)[1]
+                    identifier = self.print_statement.parseString(statement, parseAll=True)[1]
                     if identifier in self.variable_stack:
                         print self.variable_stack[identifier[0]][0]
                     else:
@@ -88,9 +88,9 @@ class MyHL(object):
                     return False, 1
             elif statement.startswith('read'):
                 try:
-                    identifier = self.read_statement.parseString(statement)[1]
+                    identifier = self.read_statement.parseString(statement, parseAll=True)[1]
                     if identifier in self.variable_stack:
-                        if self.variable_stack[identifier][1] == 'int':
+                        if self.variable_stack[identifier][1] == 'number':
                             val, ok = parent.getInt(identifier)
                         else:
                             val, ok = parent.getString(identifier)
@@ -109,9 +109,9 @@ class MyHL(object):
                     return False, 1 
             else:
                 try:
-                    ass_stmt = self.assignment_statement.parseString(statement)
+                    ass_stmt = self.assignment_statement.parseString(statement, parseAll=True)
                     try: 
-                        self.number_exp.parseString("".join(ass_stmt[-1]))
+                        self.number_exp.parseString("".join(ass_stmt[-1]), parseAll=True)
                         for i,v in enumerate(ass_stmt[-1]):
                             if not v in ['+', '-', '/' , '*', '%']:
                                 try:
@@ -125,7 +125,7 @@ class MyHL(object):
                     except:
                         expression = ass_stmt[-1]
                     finally:
-                        if self.variable_stack[ass_stmt[0]][1] == 'int':
+                        if self.variable_stack[ass_stmt[0]][1] == 'number':
                             try:
                                 self.variable_stack[ass_stmt[0]][0] = int(expression)
                             except:
