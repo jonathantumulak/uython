@@ -5,12 +5,12 @@ class MyHL(object):
         identifier = Word(alphas + alphanums)
         identifier_list = identifier + ZeroOrMore(Word(',') + identifier)
         self.number_exp = Group(Word(alphanums) + OneOrMore(Word("+-/*%", exact=1) + Word(alphanums)))
-        expression = self.number_exp | Word('"' + printables+ '"') | identifier
+        expression = self.number_exp | Group(Literal('"') + Word(printables, excludeChars='"') + Literal('"')) | identifier
         datatype = Literal('number') | Literal('word')
-        self.print_statement = "print" + identifier
-        self.read_statement = "read" + identifier
-        self.assignment_statement = identifier + "=" + expression
-        self.variable_declaration = identifier_list + "use as" + datatype
+        self.print_statement = "print" + identifier + ";"
+        self.read_statement = "read" + identifier + ";"
+        self.assignment_statement = identifier + "=" + expression + ";"
+        self.variable_declaration = identifier_list + "use as" + datatype + ";"
         self.variable_stack = {}
 
         # with open('input.uy', 'r') as inputFile:
@@ -81,7 +81,7 @@ class MyHL(object):
                 try:
                     identifier = self.print_statement.parseString(statement, parseAll=True)[1]
                     if identifier in self.variable_stack:
-                        print self.variable_stack[identifier[0]][0]
+                        print self.variable_stack[identifier][0]
                     else:
                         return False, 2
                 except:
@@ -111,28 +111,31 @@ class MyHL(object):
                 try:
                     ass_stmt = self.assignment_statement.parseString(statement, parseAll=True)
                     try: 
-                        self.number_exp.parseString("".join(ass_stmt[-1]), parseAll=True)
-                        for i,v in enumerate(ass_stmt[-1]):
+                        self.number_exp.parseString("".join(ass_stmt[-2]), parseAll=True)
+                        for i,v in enumerate(ass_stmt[-2]):
                             if not v in ['+', '-', '/' , '*', '%']:
                                 try:
                                     int(v)
                                 except:
                                     if v in self.variable_stack:
-                                        ass_stmt[-1][i] = str(self.variable_stack[v][0])
+                                        ass_stmt[-2][i] = str(self.variable_stack[v][0])
                                     else:
                                         return False, 2
-                        expression = self.arithmetic_ops("".join(ass_stmt[-1]))
+                        expression = self.arithmetic_ops("".join(ass_stmt[-2]))
                     except:
-                        expression = ass_stmt[-1]
+                        expression = ass_stmt[-2]
                     finally:
+                        if not ass_stmt[0] in self.variable_stack:
+                            return False, 2
+
                         if self.variable_stack[ass_stmt[0]][1] == 'number':
                             try:
                                 self.variable_stack[ass_stmt[0]][0] = int(expression)
                             except:
                                 return False, 3
                         else:
-                            if expression.startswith('"') and expression.endswith('"'):
-                                self.variable_stack[ass_stmt[0]][0] = expression[1:-1]
+                            if expression[0] == '"' and expression[-1] == '"':
+                                self.variable_stack[ass_stmt[0]][0] = expression[1]
                             else:
                                 return False, 3
 

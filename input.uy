@@ -1,16 +1,16 @@
 begin vars
-a,b,d use as number
-c use as word
+a,b,d use as number;
+c use as word;
 end vars
 begin statements //comment1
 //read a
-d = 3
+d = 3;
 // comment
-b = d - 2 //adding strings and special characters
-c = "MARC" //adding strings
-print a + asd
-print x
-print b
-print c
-print z
+b = d - 2; //adding strings and special characters
+c = "MARC"; //adding strings
+print a;
+//print x;
+print b;
+print c;
+//print z;
 end statements
