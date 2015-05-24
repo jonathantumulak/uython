@@ -8,6 +8,10 @@ class UythonWindow(QtGui.QMainWindow, uython.Ui_Uython):
     def __init__(self, parent=None):
         super(UythonWindow, self).__init__(parent)
         self.setupUi(self)
+        self.consoleTxtEdit.setReadOnly(True)
+        self.consoleTxtEdit.setTextInteractionFlags(
+            QtCore.Qt.TextSelectableByMouse |
+            QtCore.Qt.TextSelectableByKeyboard)
         self.compiler = MyHL()
         self.executeBtn.clicked.connect(self.executeCode)
         self.actionOpen.triggered.connect(self.open_file)

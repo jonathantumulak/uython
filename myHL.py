@@ -31,6 +31,7 @@ class MyHL(object):
         else:
             end_vars = False
             begin_stmt = False
+            error = False
             for i in code[1:-1]:
                 if not i.startswith('//'):
                     if i == "end vars":
@@ -41,15 +42,18 @@ class MyHL(object):
                             begin_stmt = True
                         else:
                             print "Formal declaration of variables must end with 'end vars' statement."
+                            error = True
                             err_line = -1
                             break
                     elif end_vars and not begin_stmt:
                         print "Program statements should begin with 'begin statements' statement."
+                        error = True
                         err_line = -1
                         break
                     else:
                         success, err_code = self.check_and_execute(i, begin_stmt, parent)
                         if not success:
+                            error = True
                             if err_code == 1:
                                 print "Syntax Error at line ", code.index(i) + 1
                                 err_line = code.index(i)
@@ -64,9 +68,10 @@ class MyHL(object):
                                 err_line = code.index(i)
                             break
 
-        if err_line >= 0:
-            print err_line
-            parent.setLineFormat(err_line)
+        if error:
+            if err_line >= 0:
+                print err_line
+                parent.setLineFormat(err_line)
 
     def check_and_execute(self, statement, begin_stmt, parent=None):
         if not begin_stmt:
