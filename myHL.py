@@ -21,6 +21,7 @@ class MyHL(object):
     def run(self, code, parent=None):
 
         code = self.clean_code(code)
+        self.variable_stack = {}
 
         if code[0] != "begin vars":
             print "Code should begin with 'begin vars' statement."
@@ -70,7 +71,6 @@ class MyHL(object):
 
         if error:
             if err_line >= 0:
-                print err_line
                 parent.setLineFormat(err_line)
 
     def check_and_execute(self, statement, begin_stmt, parent=None):
@@ -156,10 +156,11 @@ class MyHL(object):
     def clean_code(self, code):
         ccode = []
         for c in code:
-            if not c.startswith('//') and c != '':
-                ccode.append(c.split('//')[0].strip())
-            else:
-                ccode.append(c)
+            if c != '':
+                if not c.startswith('//'):
+                    ccode.append(c.split('//')[0].strip())
+                else:
+                    ccode.append(c)
 
         return ccode
 
